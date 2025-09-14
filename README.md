@@ -72,3 +72,8 @@ Duty cycle greater than 1 is undefined, so we clip the duty cycle to the range [
 
 * [Pico 2WH pinout diagram](https://datasheets.raspberrypi.com/picow/pico-2-w-pinout.pdf) shows the connections to analog and digital IO.
 * Getting Started with Pi Pico [book](https://datasheets.raspberrypi.com/pico/getting-started-with-pico.pdf)
+
+
+# Team 12's Mini Project
+## Design
+As a team, we got together and defined both our function calls and how the data will be moved. We compiled it into a [Google Drawing](./doc/Team%2012%20Mini-Project%20High-Level%20Design.pdf) and delegated tasks to each of the members of our team. We also defined how the core components, like the photosensor, button, and piezo, will work. We figured that we'd get the core functionality of the Orchestra working before adding other things like indicator lights.
