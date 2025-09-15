@@ -44,10 +44,10 @@ SONG = [
 # --- Conductor Logic ---
 
 """ Code Written By Justin """
-def raw_data_from_pico(ip):
+def raw_data_from_pico():
     """Obtains raw data from a pico by pulling data from it """
-    healthUrl = f"http://{ip}/health"
-    dataUrl = f"http://{ip}/sensor"
+    healthUrl = f"http://{PICO_IPS[0]}/health"
+    dataUrl = f"http://{PICO_IPS[0]}/sensor"
     try:
         healthResponse = requests.get(healthUrl, timeout=0.1) # Pulls request data from sensor
         healthData = healthResponse.json()                    # Gets JSON data from the request
@@ -59,7 +59,7 @@ def raw_data_from_pico(ip):
         # This is expected, we can ignore it
         pass
     except requests.exceptions.RequestException as e:
-        print(f"Error contacting {ip}: {e}")
+        print(f"Error contacting {PICO_IPS[0]}: {e}")
 
     # For a time period of collectionDuration seconds, tries to obtain sensor info from the pico through looping for a certain duration
     sensorDataArray = []
@@ -75,7 +75,7 @@ def raw_data_from_pico(ip):
             sensorDataArray.append(data)
 
         except requests.exceptions.RequestException as e:
-            print(f"Error contacting {ip}: {e}")
+            print(f"Error contacting {PICO_IPS[0]}: {e}")
 
         time.sleep(timeoutInterval)
 
