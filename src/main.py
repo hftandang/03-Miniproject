@@ -137,16 +137,21 @@ async def handle_request(reader, writer):
     content_type = "text/html"
 
     # --- API Endpoint Routing ---
-    if method == "GET" and url == "/":
-        html = f"""
-        <html>
-            <body>
-                <h1>Pico Light Orchestra</h1>
-                <p>Current light sensor reading: {light_value}</p>
-            </body>
-        </html>
-        """
-        response = html
+    if method == "GET" and url == "/sensor":
+        data  = {"raw_data_array": light_value,
+                 "raw_data_length": raw_data_length}
+        response = json.dumps(data)
+        content_type = "application/json"
+
+    elif method == "GET" and url == "/health":
+        data  = {"status": "ok",
+                 "device_id": machine.unique_id(),
+                 "api": "1.0.0"} # What do this do???
+        
+        response = json.dumps(data)
+        content_type = "application/json"
+
+
     elif method == "POST" and url == "/play_note":
         # This requires reading the request body, which is not trivial.
         # A simple approach for a known content length:
