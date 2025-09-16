@@ -209,7 +209,7 @@ async def main():
     try:
         ip = connect_to_wifi()
         print(f"Starting web server on {ip}...")
-        asyncio.create_task(asyncio.start_server(handle_request, "0.0.0.0", 80))
+        asyncio.create_task(asyncio.start_server(handle_request, "128.197.28.154", 80))
     except Exception as e:
         print(f"Failed to initialize: {e}")
         return
