@@ -114,6 +114,7 @@ if __name__ == "__main__":
     print("Press Ctrl+C to stop.")
 
     try:
+        # Adds a comment (Useless)
         # Give a moment for everyone to get ready
         print("\nStarting in 3...")
         time.sleep(1)
