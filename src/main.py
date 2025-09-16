@@ -129,9 +129,9 @@ async def handle_request(reader, writer):
         await writer.wait_closed()
         return
 
-    # Read current sensor value
-    if buttonPress == True:
-        light_value, raw_data_length = collect_pico_data(True)
+    # # Read current sensor value
+    # if buttonPress == True:
+    #     light_value, raw_data_length = collect_pico_data(True)
 
     response = ""
     content_type = "text/html"
