@@ -8,7 +8,7 @@ import time
 # --- Configuration ---
 # Students should populate this list with the IP address(es of their Picos
 PICO_IPS = [
-    "192.168.1.101",
+    "192.168.0.234",
 ]
 
 # --- Music Definition ---
@@ -48,38 +48,36 @@ def raw_data_from_pico():
     """Obtains raw data from a pico by pulling data from it """
     healthUrl = f"http://{PICO_IPS[0]}/health"
     dataUrl = f"http://{PICO_IPS[0]}/sensor"
+
+
     try:
-        healthResponse = requests.get(healthUrl, timeout=0.1) # Pulls request data from sensor
+        healthResponse = requests.get(healthUrl, timeout= 10) # Pulls request data from sensor
         healthData = healthResponse.json()                    # Gets JSON data from the request
-        if healthData["status"] != "ok":                      # If the device isn't ok, print health data
+        if healthData["status"] == "ok":                      # If the device isn't ok, print health data
             print("Status:", healthData["status"])
             print("Device ID:", healthData["device_id"])
             print("API Version:", healthData["api"])
     except requests.exceptions.Timeout:
+        print("ERror, receive request didn't work")
         # This is expected, we can ignore it
         pass
     except requests.exceptions.RequestException as e:
         print(f"Error contacting {PICO_IPS[0]}: {e}")
 
-    # For a time period of collectionDuration seconds, tries to obtain sensor info from the pico through looping for a certain duration
-    sensorDataArray = []
-    startTime = time.time()
-    collectionDuration = 10
-    timeoutInterval = 0.1
 
-    print(f"Collecting sensor data for {collectionDuration} data points...")
-    while (time.time() - startTime) < collectionDuration:
-        try:
-            sensorResponse = requests.get(dataUrl, timeout=0.1)
-            data = sensorResponse.json()
-            sensorDataArray.append(data)
+    # Communicate over the internet to get the data
 
-        except requests.exceptions.RequestException as e:
-            print(f"Error contacting {PICO_IPS[0]}: {e}")
+    print(f"Collecting sensor data")
+    try:
+        sensorResponse = requests.get(dataUrl, timeout=0.1)
+        data = sensorResponse.json()
+        sensorDataArray = (data["raw_data_array"])[:]
+        sensorDataLength = data["raw_data_length"]
 
-        time.sleep(timeoutInterval)
+    except requests.exceptions.RequestException as e:
+        print(f"Error contacting {PICO_IPS[0]}: {e}")
 
-    return sensorDataArray, len(sensorDataArray)
+    return sensorDataArray, sensorDataLength
 
 
 # Sends the song to all the picos using the digitalvalues, digital length method
@@ -124,11 +122,16 @@ if __name__ == "__main__":
         time.sleep(1)
         print("Go!\n")
 
+        sensorDataArray, sensorDataLength = raw_data_from_pico()
+        print(sensorDataArray)
+        print(sensorDataLength)
         # Play the song
+        """
         for note, duration in SONG:
             play_note_on_all_picos(note, duration)
             # Wait for the note's duration plus a small gap before playing the next one
             time.sleep(duration / 1000 * 1.1)
+        """
 
         print("\nSong finished!")
 
