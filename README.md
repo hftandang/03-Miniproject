@@ -79,8 +79,8 @@ Duty cycle greater than 1 is undefined, so we clip the duty cycle to the range [
 The ideal flow that we came up with for the light orchestra is that the user presses a button, inputs the intensity of light on the photoresistor for 10 seconds, waits for the data to be processed, and then outputs the corresponding notes on the piezo buzzer. THis process can be viewed [here](./doc/Team%2012%20Mini-Project%20Process%20Flow.pdf)
 
 ## Our Process
-<img src="./doc/design.jpg" width="20%">
-<img src="./doc/flow.jpg" width="20%">
+<img src="./doc/design.jpg" width="70%">
+<img src="./doc/flow.jpg" width="70%">
 
 As a team, we got together and defined both our function calls and how the data will be moved. We compiled it into a [Google Drawing](./doc/Team%2012%20Mini-Project%20High-Level%20Design.pdf) and delegated tasks to each of the members of our team. We also defined how the core components, like the photosensor, button, and piezo, will work. We figured that we'd get the core functionality of the Orchestra working before adding other things like indicator lights.
 
