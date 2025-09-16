@@ -14,7 +14,8 @@ photo_sensor_pin = machine.ADC(26)
 
 # The buzzer is connected to a GPIO pin that supports Pulse Width Modulation (PWM).
 # PWM allows us to create a square wave at a specific frequency to make a sound.
-buzzer_pin = machine.PWM(machine.Pin(18))
+buzzer_pin = machine.PWM(machine.Pin(12))
+buzzer_pin.duty_u16(0)
 
 # Button is connected to a GPIO pin (28). If HIGH, 1; LOW, 0
 button_pin = machine.Pin(28, machine.Pin.IN, machine.Pin.PULL_DOWN)
@@ -87,6 +88,18 @@ def map_value(x, in_min, in_max, out_min, out_max):
     """Maps a value from one range to another."""
     return (x - in_min) * (out_max - out_min) // (in_max - in_min) + out_min
 
+""" Alex's Code """
+def play_song_on_pico(digital_values, digital_length, note_duration=0.05):
+   
+    for f in digital_values:
+        if f <= 0:
+            buzzer_pin.duty_u16(0)  # silence if freq <= 0
+        else:
+            buzzer_pin.freq(int(f))
+            time.sleep(note_duration) # wait for next rising edge of 2 Hz clock
+
+    buzzer_pin.duty_u16(0)  # turn off when done
+    buzzer_pin.deinit()
 
 """ Hannah's Code """
 def collect_pico_data(record_button_stat):
@@ -149,23 +162,25 @@ async def handle_request(reader, writer):
         content_type = "application/json"
 
 
-    elif method == "POST" and url == "/play_note":
+    elif method == "POST" and url == "/melody":
         # This requires reading the request body, which is not trivial.
         # A simple approach for a known content length:
         # Note: A robust server would parse Content-Length header.
         # For this student project, we'll assume a small, simple JSON body.
         raw_data = await reader.read(1024)
         try:
+            # Loads data from the API
             data = json.loads(raw_data)
-            freq = data.get("frequency", 0)
-            duration = data.get("duration", 0)
+            musicArray = data.get("notes", 0)
+            musicLength = data.get("entries", 0)
+            print(musicArray)
 
             # If a note is already playing via API, cancel it first
             if api_note_task:
                 api_note_task.cancel()
 
             # Start the new note as a background task
-            api_note_task = asyncio.create_task(play_api_note(freq, duration))
+            play_song_on_pico(musicArray,musicLength)
 
             response = '{"status": "ok", "message": "Note playing started."}'
             content_type = "application/json"
