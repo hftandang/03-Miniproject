@@ -8,7 +8,7 @@ buzzer = PWM(Pin(16))  #can change pin number if needed
 buzzer.duty_u16(0) 
 
 
-def play_song_on_pico(digital_values, digital_length, note_duration=0.5):
+def play_song_on_pico(digital_values, digital_length, note_duration=0.05):
    
     for f in digital_values:
         if f <= 0:
