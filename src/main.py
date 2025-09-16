@@ -92,6 +92,7 @@ def map_value(x, in_min, in_max, out_min, out_max):
 def collect_pico_data(record_button_stat):
     intensity_array = []
     # Read current sensor value, ranges from 0 to 65535, 0 being low voltage 65535 meaning high voltage around 3.3V, as voltage increases so does intensity of light
+    # but it is more like 20 to 65500 realistically, need to also test ambient, etc.
     if record_button_stat:
         start_time = time.ticks_ms()
         while time.ticks_diff(time.ticks_ms(), start_time) < 10_000:
