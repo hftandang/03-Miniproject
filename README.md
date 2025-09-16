@@ -84,6 +84,7 @@ Figure 1: The above figure shows a high level organization of our code from func
 <img src="./doc/flow.jpg" width="70%">
 Figure 2: The above figure shows the process of how our system takes in user input and processes the light intensity to, send data from pico to PC, convert into song form, and output data again over wifi to play on the pico.
 
+
 As a team, we got together and defined both our function calls and how the data will be moved. We compiled it into a [Google Drawing](./doc/Team%2012%20Mini-Project%20High-Level%20Design.pdf) and delegated tasks to each of the members of our team. We also defined how the core components, like the photosensor, button, and piezo, will work. We figured that we'd get the core functionality of the Orchestra working before adding other things like indicator lights.
 
 ## Design Changes
