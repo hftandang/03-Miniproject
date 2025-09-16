@@ -17,7 +17,7 @@ photo_sensor_pin = machine.ADC(26)
 buzzer_pin = machine.PWM(machine.Pin(18))
 
 # Button is connected to a GPIO pin (28). If HIGH, 1; LOW, 0
-button_pin = machine.Pin(28, Pin.IN, Pin.PULL_DOWN)
+button_pin = machine.Pin(28, machine.Pin.IN, machine.Pin.PULL_DOWN)
 
 # --- Global State ---
 # This variable will hold the task that plays a note from an API call.
@@ -28,16 +28,6 @@ api_note_task = None
 
 
 def connect_to_wifi(wifi_config: str = "wifi_config.json"):
-    """Connects the Pico W to the specified Wi-Fi network.
-
-    This expects a JSON text file 'wifi_config.json' with 'ssid' and 'password' keys,
-    which would look like
-    {
-        "ssid": "your_wifi_ssid",
-        "password": "your_wifi_password"
-    }
-    """
-
     with open(wifi_config, "r") as f:
         data = json.load(f)
 
