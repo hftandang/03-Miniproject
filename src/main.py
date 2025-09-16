@@ -16,6 +16,9 @@ photo_sensor_pin = machine.ADC(26)
 # PWM allows us to create a square wave at a specific frequency to make a sound.
 buzzer_pin = machine.PWM(machine.Pin(18))
 
+# Button is connected to a GPIO pin (28). If HIGH, 1; LOW, 0
+button_pin = machine.Pin(28, Pin.IN, Pin.PULL_DOWN)
+
 # --- Global State ---
 # This variable will hold the task that plays a note from an API call.
 # This allows us to cancel it if a /stop request comes in.
@@ -129,9 +132,12 @@ async def handle_request(reader, writer):
         await writer.wait_closed()
         return
 
-    # # Read current sensor value
-    # if buttonPress == True:
-    #     light_value, raw_data_length = collect_pico_data(True)
+    # Read current sensor value
+    if button_pin.value() == True:
+        light_value, raw_data_length = collect_pico_data(True)
+    else:
+        light_value = [0]
+        raw_data_length = 0
 
     response = ""
     content_type = "text/html"
@@ -145,10 +151,11 @@ async def handle_request(reader, writer):
 
     elif method == "GET" and url == "/health":
         data  = {"status": "ok",
-                 "device_id": machine.unique_id(),
+                 "device_id": "hello world", #machine.unique_id(),
                  "api": "1.0.0"} # What do this do???
         
         response = json.dumps(data)
+        print("Dump data")
         content_type = "application/json"
 
 
@@ -209,11 +216,17 @@ async def main():
     try:
         ip = connect_to_wifi()
         print(f"Starting web server on {ip}...")
-        asyncio.create_task(asyncio.start_server(handle_request, "128.197.28.154", 80))
+        server = await asyncio.start_server(handle_request, "0.0.0.0", 80)
+        print("Server started in port 80")
     except Exception as e:
         print(f"Failed to initialize: {e}")
         return
-
+    
+    while True:
+        await asyncio.sleep(1)
+        
+    
+    """
     # This loop runs the "default" behavior: playing sound based on light
     while True:
         # Only run this loop if no API note is currently scheduled to play
@@ -240,9 +253,9 @@ async def main():
             else:
                 stop_tone()  # If it's very dark, be quiet
 
-        await asyncio.sleep_ms(50)  # type: ignore[attr-defined]
+        # await asyncio.sleep_ms(50)  # type: ignore[attr-defined]
 
-
+        """
 # Run the main event loop
 if __name__ == "__main__":
     try:
