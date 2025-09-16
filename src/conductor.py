@@ -2,6 +2,8 @@
 # To be run on a student's computer (not the Pico)
 # Requires the 'requests' library: pip install requests
 
+# TODO - ASK RYAN IF WE NEED TO HAVE MULTIPLE PICOS
+
 import requests
 import time
 
@@ -49,7 +51,6 @@ def raw_data_from_pico():
     healthUrl = f"http://{PICO_IPS[0]}/health"
     dataUrl = f"http://{PICO_IPS[0]}/sensor"
 
-
     try:
         healthResponse = requests.get(healthUrl, timeout= 10) # Pulls request data from sensor
         healthData = healthResponse.json()                    # Gets JSON data from the request
@@ -58,30 +59,32 @@ def raw_data_from_pico():
             print("Device ID:", healthData["device_id"])
             print("API Version:", healthData["api"])
     except requests.exceptions.Timeout:
-        print("ERror, receive request didn't work")
+        print("Error, receive request didn't work")
         # This is expected, we can ignore it
         pass
     except requests.exceptions.RequestException as e:
         print(f"Error contacting {PICO_IPS[0]}: {e}")
 
 
-    # Communicate over the internet to get the data
-
     print(f"Collecting sensor data")
     try:
-        sensorResponse = requests.get(dataUrl, timeout=0.1)
+        sensorResponse = requests.get(dataUrl, timeout=11)
         data = sensorResponse.json()
         sensorDataArray = (data["raw_data_array"])[:]
         sensorDataLength = data["raw_data_length"]
 
     except requests.exceptions.RequestException as e:
         print(f"Error contacting {PICO_IPS[0]}: {e}")
+        return None, None
 
     return sensorDataArray, sensorDataLength
 
 
 # Sends the song to all the picos using the digitalvalues, digital length method
 def send_song_to_pico(digital_values, digital_length):
+    """Sends a /tone melody request to every Pico in the list."""
+
+
     # Loops through all of the values in digital_values, and send them one-by-one to the Picos
     for i in range(digital_length):
         play_note_on_all_picos(digital_values[i],0.5)
@@ -122,7 +125,13 @@ if __name__ == "__main__":
         time.sleep(1)
         print("Go!\n")
 
-        sensorDataArray, sensorDataLength = raw_data_from_pico()
+
+        sensorDataArray, sensorDataLength = None, None
+        while sensorDataLength is None:
+            sensorDataArray, sensorDataLength = raw_data_from_pico()
+            print("Waiting for sensor")
+            time.sleep(1)
+
         print(sensorDataArray)
         print(sensorDataLength)
         # Play the song
