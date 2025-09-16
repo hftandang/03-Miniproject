@@ -13,24 +13,21 @@ def convert_to_song(analog_values, analog_length): # Function expects 2 inputs, 
 
     # For loop for converting each value in the analog_values list into a note equivalent and saving that in the respective digital_values list spot
     for i in range(analog_length):
-        if analog_values[i] <= 36.0:
+        if analog_values[i] <= 99.0:
             digital_values[i] = C
-        elif analog_values[i] <= 72.0 and analog_values[i] > 36.0:
+        elif analog_values[i] <= 199.0 and analog_values[i] > 99.0:
             digital_values[i] = D
-        elif analog_values[i] <= 108.0 and analog_values[i] > 72.0:
+        elif analog_values[i] <= 299.0 and analog_values[i] > 199.0:
             digital_values[i] = E
-        elif analog_values[i] <= 144.0 and analog_values[i] > 108.0:
+        elif analog_values[i] <= 399.0 and analog_values[i] > 299.0:
             digital_values[i] = F
-        elif analog_values[i] <= 181.0 and analog_values[i] > 144.0:
+        elif analog_values[i] <= 499.0 and analog_values[i] > 399.0:
             digital_values[i] = G
-        elif analog_values[i] <= 218.0 and analog_values[i] > 181.0:
+        elif analog_values[i] <= 599.0 and analog_values[i] > 499.0:
             digital_values[i] = A
-        elif analog_values[i] <= 255.0 and analog_values[i] > 218.0:
+        elif analog_values[i] <= 699.0 and analog_values[i] > 599.0:
             digital_values[i] = B
 
     digital_length = len(digital_values) # Length of the new digital_values list (should be identical to the original length)
 
     return digital_values, digital_length # Return both the digital_values list and the new digital length (which should be identical to the original analg length)
-
-
-
