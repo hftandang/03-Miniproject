@@ -130,7 +130,8 @@ async def handle_request(reader, writer):
         return
 
     # Read current sensor value
-    light_value = photo_sensor_pin.read_u16()
+    if buttonPress == True:
+        light_value, raw_data_length = collect_pico_data(True)
 
     response = ""
     content_type = "text/html"
