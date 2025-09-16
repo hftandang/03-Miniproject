@@ -2,8 +2,6 @@
 # To be run on a student's computer (not the Pico)
 # Requires the 'requests' library: pip install requests
 
-# TODO - ASK RYAN IF WE NEED TO HAVE MULTIPLE PICOS
-
 import requests
 import time
 
@@ -51,20 +49,6 @@ def raw_data_from_pico():
     healthUrl = f"http://{PICO_IPS[0]}/health"
     dataUrl = f"http://{PICO_IPS[0]}/sensor"
 
-    try:
-        healthResponse = requests.get(healthUrl, timeout= 10) # Pulls request data from sensor
-        healthData = healthResponse.json()                    # Gets JSON data from the request
-        if healthData["status"] == "ok":                      # If the device isn't ok, print health data
-            print("Status:", healthData["status"])
-            print("Device ID:", healthData["device_id"])
-            print("API Version:", healthData["api"])
-    except requests.exceptions.Timeout:
-        print("Error, receive request didn't work")
-        # This is expected, we can ignore it
-        pass
-    except requests.exceptions.RequestException as e:
-        print(f"Error contacting {PICO_IPS[0]}: {e}")
-
 
     print(f"Collecting sensor data")
     try:
@@ -82,7 +66,7 @@ def raw_data_from_pico():
 
 # Sends the song to all the picos using the digitalvalues, digital length method
 def send_song_to_pico(digital_values, digital_length):
-    """Sends a /tone melody request to every Pico in the list."""
+    """Sends a /melody melody request to every Pico in the list."""
     # Loops through all of the values in digital_values, and send them one-by-one to the Picos
 
     payload = {"notes": digital_values,
@@ -92,7 +76,7 @@ def send_song_to_pico(digital_values, digital_length):
         try:
             # We use a short timeout because we don't need to wait for a response
             # This makes the orchestra play more in sync.
-            requests.post(url, json=payload, timeout=0.1)
+            requests.post(url, json=payload, timeout=10)
         except requests.exceptions.Timeout:
             # This is expected, we can ignore it
             pass
@@ -177,6 +161,7 @@ if __name__ == "__main__":
         print("Go!\n")
 
 
+
         # Receives the data from the Pico
         sensorDataArray, sensorDataLength = None, None
         while sensorDataLength is None:
@@ -184,9 +169,12 @@ if __name__ == "__main__":
             print("Waiting for sensor")
             time.sleep(1)
 
+        print(sensorDataArray)
+
         # Converts the Data
         songArray, songLength = convert_to_song(sensorDataArray, sensorDataLength)
 
+        print(songArray)
         # Plays the song
         send_song_to_pico(songArray, songLength)
 
