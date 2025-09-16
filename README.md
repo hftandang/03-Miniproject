@@ -76,4 +76,34 @@ Duty cycle greater than 1 is undefined, so we clip the duty cycle to the range [
 
 # Team 12's Mini Project
 ## Design
+The ideal flow that we came up with for the light orchestra is that the user presses a button, inputs the intensity of light on the photoresistor for 10 seconds, waits for the data to be processed, and then outputs the corresponding notes on the piezo buzzer. THis process can be viewed [here](./doc/Team%2012%20Mini-Project%20Process%20Flow.pdf)
+
 As a team, we got together and defined both our function calls and how the data will be moved. We compiled it into a [Google Drawing](./doc/Team%2012%20Mini-Project%20High-Level%20Design.pdf) and delegated tasks to each of the members of our team. We also defined how the core components, like the photosensor, button, and piezo, will work. We figured that we'd get the core functionality of the Orchestra working before adding other things like indicator lights.
+
+## Design Changes
+Alberto and Justin were originally planning on using the API contract already defined in the [Project.md](./Project.md) file as our base structure for communicating between devices. As we started development, we realized that the implementation would be easier if we decided to change the API Contract a bit to better suit our proposed dataflow from the design. For this reason, we came up withe following API Calls:
+
+`GET /sensor`
+: Returns the current reading from the photoresistor.
+
+```json
+{
+  "raw_data_array": [514,733,678],
+  "entries": 3
+}
+```
+
+raw_data_array: An array of all of the raw sensor data values.
+entries: The number of elements in raw_data_array.
+
+`POST /melody`
+: Sends the frequency values from the conductor.
+
+```json
+{
+  "notes": [523,659,784],
+  "entries": 3
+}
+```
+notes: An array of all of the frequencies to be played by the piezo.
+entries: The number of elements in notes.

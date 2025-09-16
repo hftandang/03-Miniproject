@@ -83,8 +83,6 @@ def raw_data_from_pico():
 # Sends the song to all the picos using the digitalvalues, digital length method
 def send_song_to_pico(digital_values, digital_length):
     """Sends a /tone melody request to every Pico in the list."""
-
-
     # Loops through all of the values in digital_values, and send them one-by-one to the Picos
     for i in range(digital_length):
         play_note_on_all_picos(digital_values[i],0.5)
