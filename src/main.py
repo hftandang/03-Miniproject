@@ -97,7 +97,8 @@ def collect_pico_data(record_button_stat):
         start_time = time.ticks_ms()
         while time.ticks_diff(time.ticks_ms(), start_time) < 10_000:
             light_value = photo_sensor_pin.read_u16()
-            intensity_array.append(light_value)
+            mapped_light_val = map_value(light_value, 0, 65535, 0, 699)
+            intensity_array.append(mapped_light_val)
             time.sleep(0.05)  # clock is every 50ms
     return intensity_array, len(intensity_array)
 
