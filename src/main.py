@@ -22,8 +22,8 @@ button_pin = machine.Pin(28, machine.Pin.IN, machine.Pin.PULL_DOWN)
 
 # Define all the pins for color in the RGB LED
 red = Pin(15, Pin.OUT)
-green = Pin(14, Pin.OUT)
-blue = Pin(13, Pin.OUT)
+green = Pin(12, Pin.OUT)
+blue = Pin(11, Pin.OUT)
 
 # --- Global State ---
 # This variable will hold the task that plays a note from an API call.
