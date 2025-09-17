@@ -79,11 +79,11 @@ Duty cycle greater than 1 is undefined, so we clip the duty cycle to the range [
 The ideal flow that we came up with for the light orchestra is that the user presses a button, inputs the intensity of light on the photoresistor for 10 seconds, waits for the data to be processed, and then outputs the corresponding notes on the piezo buzzer. THis process can be viewed [here](./doc/Team%2012%20Mini-Project%20Process%20Flow.pdf)
 
 ## Our Process
-To split up tasks, in our first initial meeting we collaboratively created Figure 1 to figure out the overarching flow of the mini project. We then split up the functions to work on in parallel individually and used the "Issues" tab in Github to assign to each person. We also tracked the progress of all the issues using the Github "Projects" board (not started, in progress, done). 
+<p>To split up tasks, in our first initial meeting we collaboratively created Figure 1 to figure out the overarching flow of the mini project. We then split up the functions to work on in parallel individually and used the "Issues" tab in Github to assign to each person. We also tracked the progress of all the issues using the Github "Projects" board (not started, in progress, done). </p>
 <img src="./doc/design.jpg" width="70%">
-Figure 1: The above figure shows a high level organization of our code from functions, global variables, and hardware components we are working with. We split up the functions and assigned per person to be able to work in parallel for time efficiency and utilized the agile development process for integration as well.
+<p>Figure 1: The above figure shows a high level organization of our code from functions, global variables, and hardware components we are working with. We split up the functions and assigned per person to be able to work in parallel for time efficiency and utilized the agile development process for integration as well.</p>
 <img src="./doc/flow.jpg" width="70%">
-Figure 2: The above figure shows the process of how our system takes in user input and processes the light intensity to, send data from pico to PC, convert into song form, and output data again over wifi to play on the pico.
+<p>Figure 2: The above figure shows the process of how our system takes in user input and processes the light intensity to, send data from pico to PC, convert into song form, and output data again over wifi to play on the pico.</p>
 
 <p> As a team, we got together and defined both our function calls and how the data will be moved. We compiled it into a [Google Drawing](./doc/Team%2012%20Mini-Project%20High-Level%20Design.pdf) and delegated tasks to each of the members of our team. We also defined how the core components, like the photosensor, button, and piezo, will work. We figured that we'd get the core functionality of the Orchestra working before adding other things like indicator lights. </p>
 
