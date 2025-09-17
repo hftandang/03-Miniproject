@@ -79,7 +79,7 @@ Duty cycle greater than 1 is undefined, so we clip the duty cycle to the range [
 ## Final Product
 <img src="./doc/IMG_8463.jpg" width="20%">
 <img src="./doc/IMG_8464.jpg" width="20%">
-<video src="doc/IMG_8461.MOV" width="320" height="240" controls></video>
+<video src="./doc/IMG_8461.MOV" width="320" height="240" controls></video>
 
 
 ## Design
