@@ -6,6 +6,7 @@ import time
 import network
 import json
 import asyncio
+from machine import Pin
 
 # --- Pin Configuration ---
 # The photosensor is connected to an Analog-to-Digital Converter (ADC) pin.
@@ -61,10 +62,13 @@ def connect_to_wifi(wifi_config: str = "wifi_config.json"):
 def play_tone(frequency: int, duration_ms: int) -> None:
     """Plays a tone on the buzzer for a given duration."""
     if frequency > 0:
+        red.value(0)
+        green.value(1)
         buzzer_pin.freq(int(frequency))
         buzzer_pin.duty_u16(32768)  # 50% duty cycle
         time.sleep_ms(duration_ms)  # type: ignore[attr-defined]
         stop_tone()
+        green.value(0)
     else:
         time.sleep_ms(duration_ms)  # type: ignore[attr-defined]
 
@@ -99,10 +103,13 @@ def play_song_on_pico(digital_values, digital_length, note_duration=0.05):
         if f <= 0:
             buzzer_pin.duty_u16(0)  # silence if freq <= 0
         else:
+            red.value(0)
+            green.value(1)
             buzzer_pin.freq(int(f))
             buzzer_pin.duty_u16(32768) # 50% duty cycle
             print(f)
             time.sleep(note_duration) # wait for next rising edge of 2 Hz clock
+            green.value(0)
 
     buzzer_pin.duty_u16(0)  # turn off when done
 
@@ -113,9 +120,12 @@ def collect_pico_data(record_button_stat):
     if record_button_stat:
         start_time = time.ticks_ms()
         while time.ticks_diff(time.ticks_ms(), start_time) < 10_000:
+            red.value(0)
+            blue.value(1)
             light_value = map_value(photo_sensor_pin.read_u16(),0,65535,0,699)
             intensity_array.append(light_value)
             time.sleep(0.05)  # clock is every 50ms
+            blue.value(0)
     return intensity_array, len(intensity_array)
 
 
@@ -224,10 +234,12 @@ async def handle_request(reader, writer):
 async def main():
     """Main execution loop."""
     try:
+        red.value(1)
         ip = connect_to_wifi()
         print(f"Starting web server on {ip}...")
         server = await asyncio.start_server(handle_request, "0.0.0.0", 80)
         print("Server started in port 80")
+        red.value(0)
     except Exception as e:
         print(f"Failed to initialize: {e}")
         return
