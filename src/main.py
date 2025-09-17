@@ -6,6 +6,7 @@ import time
 import network
 import json
 import asyncio
+from machine import Pin
 
 # --- Pin Configuration ---
 # The photosensor is connected to an Analog-to-Digital Converter (ADC) pin.
@@ -21,9 +22,11 @@ buzzer_pin.duty_u16(0)
 button_pin = machine.Pin(28, machine.Pin.IN, machine.Pin.PULL_DOWN)
 
 # Define all the pins for color in the RGB LED
+
 red = machine.Pin(11, machine.Pin.OUT)
 green = machine.Pin(9, machine.Pin.OUT)
 blue = machine.Pin(8, machine.Pin.OUT)
+
 # --- Global State ---
 # This variable will hold the task that plays a note from an API call.
 # This allows us to cancel it if a /stop request comes in.
@@ -106,10 +109,13 @@ def play_song_on_pico(digital_values, digital_length, note_duration=0.05):
         if f <= 0:
             buzzer_pin.duty_u16(0)  # silence if freq <= 0
         else:
+            red.value(0)
+            green.value(1)
             buzzer_pin.freq(int(f))
             buzzer_pin.duty_u16(32768) # 50% duty cycle
             print(f)
             time.sleep(note_duration) # wait for next rising edge of 2 Hz clock
+            green.value(0)
 
     buzzer_pin.duty_u16(0)  # turn off when done
 
