@@ -96,10 +96,11 @@ def play_song_on_pico(digital_values, digital_length, note_duration=0.05):
             buzzer_pin.duty_u16(0)  # silence if freq <= 0
         else:
             buzzer_pin.freq(int(f))
+            buzzer_pin.duty_u16(32768) # 50% duty cycle
+            print(f)
             time.sleep(note_duration) # wait for next rising edge of 2 Hz clock
 
     buzzer_pin.duty_u16(0)  # turn off when done
-    buzzer_pin.deinit()
 
 """ Hannah's Code """
 def collect_pico_data(record_button_stat):
@@ -108,7 +109,7 @@ def collect_pico_data(record_button_stat):
     if record_button_stat:
         start_time = time.ticks_ms()
         while time.ticks_diff(time.ticks_ms(), start_time) < 10_000:
-            light_value = photo_sensor_pin.read_u16()
+            light_value = map_value(photo_sensor_pin.read_u16(),0,65535,0,699)
             intensity_array.append(light_value)
             time.sleep(0.05)  # clock is every 50ms
     return intensity_array, len(intensity_array)
@@ -167,7 +168,7 @@ async def handle_request(reader, writer):
         # A simple approach for a known content length:
         # Note: A robust server would parse Content-Length header.
         # For this student project, we'll assume a small, simple JSON body.
-        raw_data = await reader.read(1024)
+        raw_data = await reader.read(65536)
         try:
             # Loads data from the API
             data = json.loads(raw_data)
