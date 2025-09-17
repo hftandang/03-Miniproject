@@ -31,7 +31,7 @@ api_note_task = None
 
 # --- Core Functions ---
 
-
+# Function to connect to Wifi
 def connect_to_wifi(wifi_config: str = "wifi_config.json"):
     with open(wifi_config, "r") as f:
         data = json.load(f)
@@ -57,51 +57,19 @@ def connect_to_wifi(wifi_config: str = "wifi_config.json"):
         print(f"Connected! Pico IP Address: {ip_address}")
     return ip_address
 
-
-def play_tone(frequency: int, duration_ms: int) -> None:
-    """Plays a tone on the buzzer for a given duration."""
-    if frequency > 0:
-        blue.value(0)
-        red.value(0)
-        time.sleep(0.05)
-        green.value(1)
-        buzzer_pin.freq(int(frequency))
-        buzzer_pin.duty_u16(32768)  # 50% duty cycle
-        time.sleep_ms(duration_ms)  # type: ignore[attr-defined]
-        green.value(0)
-        time.sleep(0.05)
-        red.value(1)
-        #stop_tone()
-    else:
-        time.sleep_ms(duration_ms)  # type: ignore[attr-defined]
-
-
+# Function to stop the tone
 def stop_tone():
     """Stops any sound from playing."""
     buzzer_pin.duty_u16(0)  # 0% duty cycle means silence
 
-
-async def play_api_note(frequency, duration_s):
-    """Coroutine to play a note from an API call, can be cancelled."""
-    try:
-        print(f"API playing note: {frequency}Hz for {duration_s}s")
-        buzzer_pin.freq(int(frequency))
-        buzzer_pin.duty_u16(32768)  # 50% duty cycle
-        await asyncio.sleep(duration_s)
-        stop_tone()
-        print("API note finished.")
-    except asyncio.CancelledError:
-        stop_tone()
-        print("API note cancelled.")
-
-
+# Function to map values from sensor range to processor range in conductor.py on the PC
 def map_value(x, in_min, in_max, out_min, out_max):
     """Maps a value from one range to another."""
     return (x - in_min) * (out_max - out_min) // (in_max - in_min) + out_min
 
 """ Alex's Code """
+# Function to play code on the pico
 def play_song_on_pico(digital_values, digital_length, note_duration=0.05):
-   
     for f in digital_values:
         if f <= 0:
             buzzer_pin.duty_u16(0)  # silence if freq <= 0
@@ -114,6 +82,7 @@ def play_song_on_pico(digital_values, digital_length, note_duration=0.05):
     buzzer_pin.duty_u16(0)  # turn off when done
 
 """ Hannah's Code """
+# Function to collect photoresistor data on the Pico
 def collect_pico_data(record_button_stat):
     intensity_array = []
     # Read current sensor value, ranges from 0 to 65535, 0 being low voltage 65535 meaning high voltage around 3.3V, as voltage increases so does intensity of light
@@ -129,7 +98,7 @@ def collect_pico_data(record_button_stat):
             blue.value(0)
     return intensity_array, len(intensity_array)
 
-
+""" Alberto's Code """
 async def handle_request(reader, writer):
     """Handles incoming HTTP requests."""
     global api_note_task
@@ -162,22 +131,14 @@ async def handle_request(reader, writer):
     content_type = "text/html"
 
     # --- API Endpoint Routing ---
+    # Function to send sensor data to the PC with API Contract
     if method == "GET" and url == "/sensor":
         data  = {"raw_data_array": light_value,
                  "raw_data_length": raw_data_length}
         response = json.dumps(data)
         content_type = "application/json"
 
-    elif method == "GET" and url == "/health":
-        data  = {"status": "ok",
-                 "device_id": "hello world", #machine.unique_id(),
-                 "api": "1.0.0"} # What do this do???
-        
-        response = json.dumps(data)
-        print("Dump data")
-        content_type = "application/json"
-
-
+    # Function to receive music data from the PC
     elif method == "POST" and url == "/melody":
         # This requires reading the request body, which is not trivial.
         # A simple approach for a known content length:
@@ -207,13 +168,6 @@ async def handle_request(reader, writer):
             await writer.wait_closed()
             return
 
-    elif method == "POST" and url == "/stop":
-        if api_note_task:
-            api_note_task.cancel()
-            api_note_task = None
-        stop_tone()  # Force immediate stop
-        response = '{"status": "ok", "message": "All sounds stopped."}'
-        content_type = "application/json"
     else:
         writer.write(b"HTTP/1.0 404 Not Found\r\n\r\n")
         await writer.drain()
@@ -248,37 +202,6 @@ async def main():
     while True:
         await asyncio.sleep(1)
         
-    
-    """
-    # This loop runs the "default" behavior: playing sound based on light
-    while True:
-        # Only run this loop if no API note is currently scheduled to play
-        if api_note_task is None or api_note_task.done():
-            # Read the sensor. Values range from ~500 (dark) to ~65535 (bright)
-            light_value = photo_sensor_pin.read_u16()
-
-            # Map the light value to a frequency range (e.g., C4 to C6)
-            # Adjust the input range based on your room's lighting
-            min_light = 1000
-            max_light = 65000
-            min_freq = 261  # C4
-            max_freq = 1046  # C6
-
-            # Clamp the light value to the expected range
-            clamped_light = max(min_light, min(light_value, max_light))
-
-            if clamped_light > min_light:
-                frequency = map_value(
-                    clamped_light, min_light, max_light, min_freq, max_freq
-                )
-                buzzer_pin.freq(frequency)
-                buzzer_pin.duty_u16(32768)  # 50% duty cycle
-            else:
-                stop_tone()  # If it's very dark, be quiet
-
-        # await asyncio.sleep_ms(50)  # type: ignore[attr-defined]
-
-        """
 # Run the main event loop
 if __name__ == "__main__":
     try:
