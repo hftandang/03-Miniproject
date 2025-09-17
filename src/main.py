@@ -62,6 +62,7 @@ def connect_to_wifi(wifi_config: str = "wifi_config.json"):
 def play_tone(frequency: int, duration_ms: int) -> None:
     """Plays a tone on the buzzer for a given duration."""
     if frequency > 0:
+        red.value(0)
         green.value(1)
         buzzer_pin.freq(int(frequency))
         buzzer_pin.duty_u16(32768)  # 50% duty cycle
@@ -102,6 +103,7 @@ def play_song_on_pico(digital_values, digital_length, note_duration=0.05):
         if f <= 0:
             buzzer_pin.duty_u16(0)  # silence if freq <= 0
         else:
+            red.value(0)
             green.value(1)
             buzzer_pin.freq(int(f))
             buzzer_pin.duty_u16(32768) # 50% duty cycle
@@ -118,6 +120,7 @@ def collect_pico_data(record_button_stat):
     if record_button_stat:
         start_time = time.ticks_ms()
         while time.ticks_diff(time.ticks_ms(), start_time) < 10_000:
+            red.value(0)
             blue.value(1)
             light_value = map_value(photo_sensor_pin.read_u16(),0,65535,0,699)
             intensity_array.append(light_value)
