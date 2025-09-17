@@ -6,6 +6,7 @@ import time
 import network
 import json
 import asyncio
+from machine import Pin
 
 # --- Pin Configuration ---
 # The photosensor is connected to an Analog-to-Digital Converter (ADC) pin.
@@ -18,6 +19,11 @@ buzzer_pin = machine.PWM(machine.Pin(18))
 
 # Button is connected to a GPIO pin (28). If HIGH, 1; LOW, 0
 button_pin = machine.Pin(28, machine.Pin.IN, machine.Pin.PULL_DOWN)
+
+# Define all the pins for color in the RGB LED
+red = Pin(15, Pin.OUT)
+green = Pin(14, Pin.OUT)
+blue = Pin(13, Pin.OUT)
 
 # --- Global State ---
 # This variable will hold the task that plays a note from an API call.
@@ -56,10 +62,12 @@ def connect_to_wifi(wifi_config: str = "wifi_config.json"):
 def play_tone(frequency: int, duration_ms: int) -> None:
     """Plays a tone on the buzzer for a given duration."""
     if frequency > 0:
+        green.value(1)
         buzzer_pin.freq(int(frequency))
         buzzer_pin.duty_u16(32768)  # 50% duty cycle
         time.sleep_ms(duration_ms)  # type: ignore[attr-defined]
         stop_tone()
+        green.value(0)
     else:
         time.sleep_ms(duration_ms)  # type: ignore[attr-defined]
 
@@ -72,12 +80,15 @@ def stop_tone():
 async def play_api_note(frequency, duration_s):
     """Coroutine to play a note from an API call, can be cancelled."""
     try:
+        red.value(0)
+        green.value(1)
         print(f"API playing note: {frequency}Hz for {duration_s}s")
         buzzer_pin.freq(int(frequency))
         buzzer_pin.duty_u16(32768)  # 50% duty cycle
         await asyncio.sleep(duration_s)
         stop_tone()
         print("API note finished.")
+        green.value(0)
     except asyncio.CancelledError:
         stop_tone()
         print("API note cancelled.")
@@ -94,12 +105,15 @@ def collect_pico_data(record_button_stat):
     # Read current sensor value, ranges from 0 to 65535, 0 being low voltage 65535 meaning high voltage around 3.3V, as voltage increases so does intensity of light
     # but it is more like 20 to 65500 realistically, need to also test ambient, etc.
     if record_button_stat:
+        blue.value(1)
+        red.value(0)
         start_time = time.ticks_ms()
         while time.ticks_diff(time.ticks_ms(), start_time) < 10_000:
             light_value = photo_sensor_pin.read_u16()
             mapped_light_val = map_value(light_value, 0, 65535, 0, 699)
             intensity_array.append(mapped_light_val)
             time.sleep(0.05)  # clock is every 50ms
+    blue.value(0)
     return intensity_array, len(intensity_array)
 
 
@@ -207,6 +221,7 @@ async def main():
     """Main execution loop."""
     try:
         ip = connect_to_wifi()
+        red.value(1)
         print(f"Starting web server on {ip}...")
         server = await asyncio.start_server(handle_request, "0.0.0.0", 80)
         print("Server started in port 80")
