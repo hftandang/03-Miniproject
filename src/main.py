@@ -53,6 +53,7 @@ def connect_to_wifi(wifi_config: str = "wifi_config.json"):
     return ip_address
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 
 def play_tone(frequency: int, duration_ms: int) -> None:
     """Plays a tone on the buzzer for a given duration."""
@@ -65,6 +66,9 @@ def play_tone(frequency: int, duration_ms: int) -> None:
         time.sleep_ms(duration_ms)  # type: ignore[attr-defined]
 
 
+=======
+# Stops playing the Buzzer
+>>>>>>> Stashed changes
 =======
 # Stops playing the Buzzer
 >>>>>>> Stashed changes
@@ -154,6 +158,7 @@ async def handle_request(reader, writer):
         content_type = "application/json"
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     elif method == "GET" and url == "/health":
         data  = {"status": "ok",
                  "device_id": "hello world", #machine.unique_id(),
@@ -166,6 +171,8 @@ async def handle_request(reader, writer):
 
     elif method == "POST" and url == "/play_note":
 =======
+=======
+>>>>>>> Stashed changes
     # Function to receive data from the PC
     elif method == "POST" and url == "/melody":
 >>>>>>> Stashed changes
