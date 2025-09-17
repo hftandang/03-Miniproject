@@ -75,5 +75,49 @@ Duty cycle greater than 1 is undefined, so we clip the duty cycle to the range [
 
 
 # Team 12's Mini Project
+
+## Final Product
+
 ## Design
-As a team, we got together and defined both our function calls and how the data will be moved. We compiled it into a [Google Drawing](./doc/Team%2012%20Mini-Project%20High-Level%20Design.pdf) and delegated tasks to each of the members of our team. We also defined how the core components, like the photosensor, button, and piezo, will work. We figured that we'd get the core functionality of the Orchestra working before adding other things like indicator lights.
+The ideal flow that we came up with for the light orchestra is that the user presses a button, inputs the intensity of light on the photoresistor for 10 seconds, waits for the data to be processed, and then outputs the corresponding notes on the piezo buzzer. This process can be viewed [here](./doc/Team%2012%20Mini-Project%20Process%20Flow.pdf)
+
+## Our Process
+<p>To split up tasks, in our first initial meeting we collaboratively created Figure 1 to figure out the overarching flow of the mini project. We then split up the functions to work on in parallel individually and used the "Issues" tab in Github to assign to each person. We also tracked the progress of all the issues using the Github "Projects" board (not started, in progress, done). </p>
+<img src="./doc/design.jpg" width="70%">
+<p>Figure 1: The above figure shows a high level organization of our code from functions, global variables, and hardware components we are working with. We split up the functions and assigned per person to be able to work in parallel for time efficiency and utilized the agile development process for integration as well.</p>
+<img src="./doc/flow.jpg" width="70%">
+<p>Figure 2: The above figure shows the process of how our system takes in user input and processes the light intensity to, send data from pico to PC, convert into song form, and output data again over wifi to play on the pico.</p>
+
+<p> As a team, we got together and defined both our function calls and how the data will be moved. We compiled it into a Google Drawing and delegated tasks to each of the members of our team. We also defined how the core components, like the photosensor, button, and piezo, will work. We figured that we'd get the core functionality of the Orchestra working before adding other things like indicator lights. </p>
+
+
+## Design Changes
+Alberto and Justin were originally planning on using the API contract already defined in the [Project.md](./Project.md) file as our base structure for communicating between devices. As we started development, we realized that the implementation would be easier if we decided to change the API Contract a bit to better suit our proposed dataflow from the design. For this reason, we came up withe following API Calls:
+
+`GET /sensor`
+: Returns the current reading from the photoresistor.
+
+```json
+{
+  "raw_data_array": [514,733,678],
+  "entries": 3
+}
+```
+
+raw_data_array: An array of all of the raw sensor data values.
+entries: The number of elements in raw_data_array.
+
+
+`POST /melody`
+: Sends the frequency values from the conductor.
+
+```json
+{
+  "notes": [523,659,784],
+  "entries": 3
+}
+```
+notes: An array of all of the frequencies to be played by the piezo.
+entries: The number of elements in notes.
+<p>---------</p>
+<p> Additionally, during testing we wanted a visual indicator showing what stage in the process (idle, recording, playing) the pico was in. Since we are using the Agile design scheme, we want back to the design phase and Hannah implemented the RGB LED to display white during idle, pink during recording, and blue during playing.</p>
