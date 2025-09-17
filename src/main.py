@@ -20,6 +20,10 @@ buzzer_pin.duty_u16(0)
 # Button is connected to a GPIO pin (28). If HIGH, 1; LOW, 0
 button_pin = machine.Pin(28, machine.Pin.IN, machine.Pin.PULL_DOWN)
 
+# Define all the pins for color in the RGB LED
+red = machine.Pin(11, machine.Pin.OUT)
+green = machine.Pin(9, machine.Pin.OUT)
+blue = machine.Pin(8, machine.Pin.OUT)
 # --- Global State ---
 # This variable will hold the task that plays a note from an API call.
 # This allows us to cancel it if a /stop request comes in.
@@ -57,10 +61,17 @@ def connect_to_wifi(wifi_config: str = "wifi_config.json"):
 def play_tone(frequency: int, duration_ms: int) -> None:
     """Plays a tone on the buzzer for a given duration."""
     if frequency > 0:
+        blue.value(0)
+        red.value(0)
+        time.sleep(0.05)
+        green.value(1)
         buzzer_pin.freq(int(frequency))
         buzzer_pin.duty_u16(32768)  # 50% duty cycle
         time.sleep_ms(duration_ms)  # type: ignore[attr-defined]
-        stop_tone()
+        green.value(0)
+        time.sleep(0.05)
+        red.value(1)
+        #stop_tone()
     else:
         time.sleep_ms(duration_ms)  # type: ignore[attr-defined]
 
@@ -109,9 +120,13 @@ def collect_pico_data(record_button_stat):
     if record_button_stat:
         start_time = time.ticks_ms()
         while time.ticks_diff(time.ticks_ms(), start_time) < 10_000:
+            red.value(0)
+            time.sleep(0.01)
+            blue.value(1)
             light_value = map_value(photo_sensor_pin.read_u16(),0,65535,0,699)
             intensity_array.append(light_value)
             time.sleep(0.05)  # clock is every 50ms
+            blue.value(0)
     return intensity_array, len(intensity_array)
 
 
@@ -220,10 +235,12 @@ async def handle_request(reader, writer):
 async def main():
     """Main execution loop."""
     try:
+        red.value(1)
         ip = connect_to_wifi()
         print(f"Starting web server on {ip}...")
         server = await asyncio.start_server(handle_request, "0.0.0.0", 80)
         print("Server started in port 80")
+        red.value(0)
     except Exception as e:
         print(f"Failed to initialize: {e}")
         return
@@ -269,5 +286,3 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         print("Program stopped.")
         stop_tone()
-
-# This code has been replaced to DNFD @ 3:02pm 09/17/2025
