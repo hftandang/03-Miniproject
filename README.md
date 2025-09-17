@@ -119,3 +119,5 @@ entries: The number of elements in raw_data_array.
 ```
 notes: An array of all of the frequencies to be played by the piezo.
 entries: The number of elements in notes.
+
+<p> During testing we wanted a visual indicator showing what stage in the process (idle, recording, playing) the pico was in. Since we are using the Agile design scheme, we want back to the design phase and Hannah implemented the RGB LED to display white during idle, pink during recording, and blue during playing.</p>
