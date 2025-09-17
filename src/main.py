@@ -20,6 +20,10 @@ buzzer_pin.duty_u16(0)
 # Button is connected to a GPIO pin (28). If HIGH, 1; LOW, 0
 button_pin = machine.Pin(28, machine.Pin.IN, machine.Pin.PULL_DOWN)
 
+# Define all the pins for color in the RGB LED
+red = Pin(15, Pin.OUT)
+green = Pin(12, Pin.OUT)
+blue = Pin(11, Pin.OUT)
 # --- Global State ---
 # This variable will hold the task that plays a note from an API call.
 # This allows us to cancel it if a /stop request comes in.
