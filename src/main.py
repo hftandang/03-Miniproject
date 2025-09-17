@@ -6,7 +6,6 @@ import time
 import network
 import json
 import asyncio
-from machine import Pin
 
 # --- Pin Configuration ---
 # The photosensor is connected to an Analog-to-Digital Converter (ADC) pin.
@@ -15,7 +14,8 @@ photo_sensor_pin = machine.ADC(26)
 
 # The buzzer is connected to a GPIO pin that supports Pulse Width Modulation (PWM).
 # PWM allows us to create a square wave at a specific frequency to make a sound.
-buzzer_pin = machine.PWM(machine.Pin(18))
+buzzer_pin = machine.PWM(machine.Pin(12))
+buzzer_pin.duty_u16(0)
 
 # Button is connected to a GPIO pin (28). If HIGH, 1; LOW, 0
 button_pin = machine.Pin(28, machine.Pin.IN, machine.Pin.PULL_DOWN)
@@ -24,7 +24,6 @@ button_pin = machine.Pin(28, machine.Pin.IN, machine.Pin.PULL_DOWN)
 red = Pin(15, Pin.OUT)
 green = Pin(12, Pin.OUT)
 blue = Pin(11, Pin.OUT)
-
 # --- Global State ---
 # This variable will hold the task that plays a note from an API call.
 # This allows us to cancel it if a /stop request comes in.
@@ -62,12 +61,10 @@ def connect_to_wifi(wifi_config: str = "wifi_config.json"):
 def play_tone(frequency: int, duration_ms: int) -> None:
     """Plays a tone on the buzzer for a given duration."""
     if frequency > 0:
-        green.value(1)
         buzzer_pin.freq(int(frequency))
         buzzer_pin.duty_u16(32768)  # 50% duty cycle
         time.sleep_ms(duration_ms)  # type: ignore[attr-defined]
         stop_tone()
-        green.value(0)
     else:
         time.sleep_ms(duration_ms)  # type: ignore[attr-defined]
 
@@ -80,15 +77,12 @@ def stop_tone():
 async def play_api_note(frequency, duration_s):
     """Coroutine to play a note from an API call, can be cancelled."""
     try:
-        red.value(0)
-        green.value(1)
         print(f"API playing note: {frequency}Hz for {duration_s}s")
         buzzer_pin.freq(int(frequency))
         buzzer_pin.duty_u16(32768)  # 50% duty cycle
         await asyncio.sleep(duration_s)
         stop_tone()
         print("API note finished.")
-        green.value(0)
     except asyncio.CancelledError:
         stop_tone()
         print("API note cancelled.")
@@ -98,22 +92,30 @@ def map_value(x, in_min, in_max, out_min, out_max):
     """Maps a value from one range to another."""
     return (x - in_min) * (out_max - out_min) // (in_max - in_min) + out_min
 
+""" Alex's Code """
+def play_song_on_pico(digital_values, digital_length, note_duration=0.05):
+   
+    for f in digital_values:
+        if f <= 0:
+            buzzer_pin.duty_u16(0)  # silence if freq <= 0
+        else:
+            buzzer_pin.freq(int(f))
+            buzzer_pin.duty_u16(32768) # 50% duty cycle
+            print(f)
+            time.sleep(note_duration) # wait for next rising edge of 2 Hz clock
+
+    buzzer_pin.duty_u16(0)  # turn off when done
 
 """ Hannah's Code """
 def collect_pico_data(record_button_stat):
     intensity_array = []
     # Read current sensor value, ranges from 0 to 65535, 0 being low voltage 65535 meaning high voltage around 3.3V, as voltage increases so does intensity of light
-    # but it is more like 20 to 65500 realistically, need to also test ambient, etc.
     if record_button_stat:
-        blue.value(1)
-        red.value(0)
         start_time = time.ticks_ms()
         while time.ticks_diff(time.ticks_ms(), start_time) < 10_000:
-            light_value = photo_sensor_pin.read_u16()
-            mapped_light_val = map_value(light_value, 0, 65535, 0, 699)
-            intensity_array.append(mapped_light_val)
+            light_value = map_value(photo_sensor_pin.read_u16(),0,65535,0,699)
+            intensity_array.append(light_value)
             time.sleep(0.05)  # clock is every 50ms
-    blue.value(0)
     return intensity_array, len(intensity_array)
 
 
@@ -165,23 +167,25 @@ async def handle_request(reader, writer):
         content_type = "application/json"
 
 
-    elif method == "POST" and url == "/play_note":
+    elif method == "POST" and url == "/melody":
         # This requires reading the request body, which is not trivial.
         # A simple approach for a known content length:
         # Note: A robust server would parse Content-Length header.
         # For this student project, we'll assume a small, simple JSON body.
-        raw_data = await reader.read(1024)
+        raw_data = await reader.read(65536)
         try:
+            # Loads data from the API
             data = json.loads(raw_data)
-            freq = data.get("frequency", 0)
-            duration = data.get("duration", 0)
+            musicArray = data.get("notes", 0)
+            musicLength = data.get("entries", 0)
+            print(musicArray)
 
             # If a note is already playing via API, cancel it first
             if api_note_task:
                 api_note_task.cancel()
 
             # Start the new note as a background task
-            api_note_task = asyncio.create_task(play_api_note(freq, duration))
+            play_song_on_pico(musicArray,musicLength)
 
             response = '{"status": "ok", "message": "Note playing started."}'
             content_type = "application/json"
@@ -221,7 +225,6 @@ async def main():
     """Main execution loop."""
     try:
         ip = connect_to_wifi()
-        red.value(1)
         print(f"Starting web server on {ip}...")
         server = await asyncio.start_server(handle_request, "0.0.0.0", 80)
         print("Server started in port 80")

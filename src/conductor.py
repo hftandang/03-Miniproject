@@ -11,46 +11,15 @@ PICO_IPS = [
     "192.168.0.234",
 ]
 
-# --- Music Definition ---
-# Notes mapped to frequencies (in Hz)
-C4 = 262
-D4 = 294
-E4 = 330
-F4 = 349
-G4 = 392
-A4 = 440
-B4 = 494
-C5 = 523
-
-# A simple melody: "Twinkle, Twinkle, Little Star"
-# Format: (note_frequency, duration_in_ms)
-SONG = [
-    (C4, 400),
-    (C4, 400),
-    (G4, 400),
-    (G4, 400),
-    (A4, 400),
-    (A4, 400),
-    (G4, 800),
-    (F4, 400),
-    (F4, 400),
-    (E4, 400),
-    (E4, 400),
-    (D4, 400),
-    (D4, 400),
-    (C4, 800),
-]
-
 # --- Conductor Logic ---
-
 """ Code Written By Justin """
+# Retrieves raw sensor data from the Pico
 def raw_data_from_pico():
     """Obtains raw data from a pico by pulling data from it """
-    healthUrl = f"http://{PICO_IPS[0]}/health"
     dataUrl = f"http://{PICO_IPS[0]}/sensor"
 
-
-    print(f"Collecting sensor data")
+    # Collects data from the Pico from a JSON file
+    print("Collecting sensor data")
     try:
         sensorResponse = requests.get(dataUrl, timeout=11)
         data = sensorResponse.json()
@@ -64,13 +33,12 @@ def raw_data_from_pico():
     return sensorDataArray, sensorDataLength
 
 
-# Sends the song to all the picos using the digitalvalues, digital length method
+# Sends the song to all the picos using the digital values, digital length method
 def send_song_to_pico(digital_values, digital_length):
     """Sends a /melody melody request to every Pico in the list."""
     # Loops through all of the values in digital_values, and send them one-by-one to the Picos
-
     payload = {"notes": digital_values,
-                "entries": digital_length}
+               "entries": digital_length}
     for ip in PICO_IPS:
         url = f"http://{ip}/melody"
         try:
@@ -86,7 +54,8 @@ def send_song_to_pico(digital_values, digital_length):
     return
 
 
-""" Code Written By AJ """
+""" Code Written By AJ"""
+# Function to convert the raw data to music notes
 def convert_to_song(analog_values, analog_length): # Function expects 2 inputs, a list of analog values and the analog length (which should be equal to the analog values list's length)
 
     # Used Hertz for middle octive keys from link on Github
@@ -122,35 +91,12 @@ def convert_to_song(analog_values, analog_length): # Function expects 2 inputs, 
     return digital_values, digital_length # Return both the digital_values list and the new digital length (which should be identical to the original analg length)
 
 
-
-
-
-def play_note_on_all_picos(freq, ms):
-    """Sends a /tone POST request to every Pico in the list."""
-    print(f"Playing note: {freq}Hz for {ms}ms on all devices.")
-
-    payload = {"freq": freq, "ms": ms, "duty": 0.5}
-
-    for ip in PICO_IPS:
-        url = f"http://{ip}/tone"
-        try:
-            # We use a short timeout because we don't need to wait for a response
-            # This makes the orchestra play more in sync.
-            requests.post(url, json=payload, timeout=0.1)
-        except requests.exceptions.Timeout:
-            # This is expected, we can ignore it
-            pass
-        except requests.exceptions.RequestException as e:
-            print(f"Error contacting {ip}: {e}")
-
-
 if __name__ == "__main__":
     print("--- Pico Light Orchestra Conductor ---")
     print(f"Found {len(PICO_IPS)} devices in the orchestra.")
     print("Press Ctrl+C to stop.")
 
     try:
-        # Adds a comment (Useless)
         # Give a moment for everyone to get ready
         print("\nStarting in 3...")
         time.sleep(1)
@@ -160,8 +106,6 @@ if __name__ == "__main__":
         time.sleep(1)
         print("Go!\n")
 
-
-
         # Receives the data from the Pico
         sensorDataArray, sensorDataLength = None, None
         while sensorDataLength is None:
@@ -169,11 +113,13 @@ if __name__ == "__main__":
             print("Waiting for sensor")
             time.sleep(1)
 
+        print("Sensor Data Array:")
         print(sensorDataArray)
 
         # Converts the Data
         songArray, songLength = convert_to_song(sensorDataArray, sensorDataLength)
 
+        print("Song Data Array:")
         print(songArray)
         # Plays the song
         send_song_to_pico(songArray, songLength)
