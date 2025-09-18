@@ -96,7 +96,7 @@ The ideal flow that we came up with for the light orchestra is that the user pre
 
 
 ## Design Changes
-Alberto and Justin were originally planning on using the API contract already defined in the [Project.md](./Project.md) file as a base structure for communicating between devices. As they started development, they realized that the implementation would be easier if we changed the API Contract a bit to better suit our proposed dataflow from the design. For this reason, we came up with the following API Calls:
+We were originally planning on using the API contract already defined in the [Project.md](./Project.md) file as a base structure for communicating between devices. As they started development, we realized that the implementation would be easier if we changed the API Contract a bit to better suit our proposed dataflow from the design. For this reason, we came up with the following API Calls:
 
 `GET /sensor`
 : Returns the current reading from the photoresistor.
@@ -125,11 +125,11 @@ notes: An array of all of the frequencies to be played by the piezo.
 entries: The number of elements in notes,
 
 <p>
-Among these changes, Alberto implemented a <i>handle_request</i> function to combine the previously defined fucntions (<i>raw_data_to_pc</i> & <i>get_song_from_pc</i>). This request handler connects to a client and calls <i>collect_pico_data</i> to obtain the values from the Pico and then send them to the PC. In this handler, we also have an API Endpoint Routing that utilizes API contracts to send sensor data from the Pico to the PC through a GET request. Afterwards, a POST request would be sent out allowing the client to receive the data and disconnect from the web server. This disconnect was done so that we could have an “idle” state where we could reinitiate the program by pressing a button rather than having to reset the board or turn on/off the power. Overall, this handles the communication between the Pico and the PC while calling other functions to obtain, interpret, or receive data.
+Among these changes, we implemented a <i>handle_request</i> function to combine the previously defined functions (<i>raw_data_to_pc</i> & <i>get_song_from_pc</i>). This request handler connects to a client and calls <i>collect_pico_data</i> to obtain the values from the Pico and then send them to the PC. In this handler, we also have an API Endpoint Routing that utilizes API contracts to send sensor data from the Pico to the PC through a GET request. Afterwards, a POST request would be sent out allowing the client to receive the data and disconnect from the web server. This disconnect was done so that we could have an “idle” state where we could reinitiate the program by pressing a button rather than having to reset the board or turn on/off the power. Overall, this handles the communication between the Pico and the PC while calling other functions to obtain, interpret, or receive data.
 </p>
 
 <p>---------</p>
-<p> Additionally, during testing we wanted a visual indicator showing what stage in the process (idle, recording, playing) the pico was in. Since we are using the Agile design scheme, we went back to the design phase and Hannah implemented the RGB LED to display white during idle, pink during recording, and blue during playing.</p>
+<p> Additionally, during testing we wanted a visual indicator showing what stage in the process (idle, recording, playing) the pico was in. Since we are using the Agile design scheme, we went back to the design phase and implemented the RGB LED to display white during idle, pink during recording, and blue during playing.</p>
 
 
 ### Pushing Directly to Main vs Having Separate Branches
