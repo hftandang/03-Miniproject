@@ -84,9 +84,8 @@ Duty cycle greater than 1 is undefined, so we clip the duty cycle to the range [
 
 
 ## Design
-The ideal flow that we came up with for the light orchestra is that the user presses a button, inputs the intensity of light on the photoresistor for 10 seconds, waits for the data to be processed, and then outputs the corresponding notes on the piezo buzzer. This process can be viewed [here](./doc/Team%2012%20Mini-Project%20Process%20Flow.pdf)
+The ideal flow that we came up with for the light orchestra is that the user presses a button, inputs the intensity of light on the photoresistor for 10 seconds, waits for the data to be processed, and then outputs the corresponding notes on the piezo buzzer.
 
-## Our Process
 <p>To split up tasks, in our first initial meeting we collaboratively created Figure 1 to figure out the overarching flow of the mini project. We then split up the functions to be worked on in parallel/individually and used the "Issues" tab in Github to assign functions to each person. We also tracked the progress of all the issues using the Github "Projects" board (not started, in progress, done). </p>
 <img src="./doc/design.jpg" width="70%">
 <p>Figure 1: The above figure shows a high level organization of our code including functions, global variables, and hardware components we are working with. We split up the functions and assigned assigned them per person to be worked on in parallel for time efficiency. We utilized the agile development process for integration as well.</p>
